@@ -1,0 +1,12 @@
+{
+  "name": "logServer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node log-server"
+  },
+  "dependencies": {
+	"mongoose": "*",
+	"socket.io":"*"
+  }
+}
