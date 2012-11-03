@@ -5,11 +5,13 @@ var app = require('http').createServer(handler)
 app.listen(80);
 
 function handler (req, res) {
-  fs.readFile(__dirname + '/index.html',
+  var resource = '.' + req.url;
+  console.log('Carregando : ' + resource);
+  fs.readFile(__dirname + req.url,
   function (err, data) {
     if (err) {
       res.writeHead(500);
-      return res.end('Error loading index.html');
+      return res.end('Error loading ' + resource + ' from "' + (__dirname + req.url) + '"');
     }
     res.writeHead(200);
     res.end(data);
