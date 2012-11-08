@@ -6,15 +6,53 @@
 	<script src="./ws-js/socket.io.js"></script>
 	<script src="./oo.js"></script>
 	<script src="./log.js"></script>
+	<script type="text/javascript"> 
+	  var runner = (function() {
+	
+	    var queue = [];
+		var paused = false;  
+		
+		this.Fifo = function() {
+			process : function(fn) {                    
+			  queue.push(fn);
+			  this.run();
+		    },
+			pause : function() {
+			  paused = true;                      
+			},
+			resume : function() {                    
+			  paused = false;
+			  setTimeout(this.run, 1);
+			},	
+			run : function() {                           
+			  if (!paused && queue.length) {
+				queue.shift()();
+			    if (!paused) {
+				  // resume();
+			    }
+			  } 
+			}
+		};
+
+		// The module Pattern must be return the private Class as public Class, so
+		// ...
+		return {
+			Fifo : new Fifo()
+		};
+
+	  }());
+	</script>
 	<script>
 	  var remoteLog = new logger.Logger();
 	  var socket = io.connect('http://localhost:80');
+	  var logServerStarted = false;
 	  if (socket) {
 		// console.log(logger.Logger);
 		remoteLog.setSocket(socket);
 		remoteLog.log('data logged #01 com wsDelay=' + (Date.now() - timeInMilis));
 		socket.on('news-from-server', function (data) {
 		  var wsDelay = (Date.now() - timeInMilis)
+		  logServerStarted = true;
 		  console.log('wsDelay=' + wsDelay);
 		  remoteLog.setActive();
 		  console.log(data);
@@ -24,7 +62,20 @@
 		remoteLog.log('data logged #03 com wsDelay=' + (Date.now() - timeInMilis));
 	  }
 	  remoteLog.log('data logged #04 com wsDelay=' + (Date.now() - timeInMilis));
-	  
+	  var fifo = new runner.Fifo();
+	  fifo.pause();
+	  fifo.process(function() {  
+		  // while (! logServerStarted);
+	  });
+	  fifo.process(function() { 
+		remoteLog.log('data logged #05 com wsDelay=' 
+		                  + (Date.now() - timeInMilis)); 
+	  });
+	  fifo.process(function() { 
+		remoteLog.log('data logged #06 com wsDelay=' 
+		                  + (Date.now() - timeInMilis)); 
+	  });
+	  fifo.resume();
 	</script>
 	<title>Teste de WebSocket</title>
 </head>
