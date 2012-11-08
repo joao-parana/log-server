@@ -23,3 +23,5 @@ Veja instrucoes de update do repositorio no GitHub
       git pull origin master
       git push -u origin master
 
+No Windows 7 64 bits também podemos instalar o GIT e o NODE
+
