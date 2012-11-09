@@ -1,7 +1,18 @@
-var app = require('http').createServer(handler)
-  , io = require('socket.io').listen(app)
-  , fs = require('fs');
+var app = require('http').createServer(handler);
+var io = require('socket.io').listen(app);
+var fs = require('fs');
+var static = require('node-static');
   
+
+/* http://www.sitepoint.com/serving-static-files-with-node-js  */
+var webroot = ".";
+var options = {
+  cache: 600,
+  headers: { 'X-Powered-By': 'node-static' }
+};
+var fileServer = new static.Server(webroot, options);
+
+// Ver o que será necessário fazer de refactory abaixo
 app.listen(80);
 
 function handler (req, res) {
