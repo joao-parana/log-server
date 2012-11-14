@@ -4,10 +4,10 @@ var logger = (function(isWebSocketEnable, socket) {
 		return Array.prototype.slice.call(args);
 	};
 	var Logger = Object.subClass({
-		init : function(dataSeries) {
+		init : function() {
 			// this.same_method_on_super_class();
-			this.ws_enable = isWebSocketEnable;
-			this.socket = socket;
+			this.ws_enable = isWebSocketEnable || null;
+			this.socket = socket || null;
 			this.active = false;
 		},
 		log : function() {
