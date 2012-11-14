@@ -15,6 +15,12 @@ var options = {
 var staticFileServer = new serveStaticFiles.Server(webroot, options);
 
 function httpHandlerSimpleVersion(req, res) {
+  io.configure('development', function() { // can be 'production' too
+    io.set('log level', 2); // reduce logging to INFO level
+    // io.set('transports', [ 'websocket', 'flashsocket', 'htmlfile',
+    // 'xhr-polling', 'jsonp-polling' ]);
+  });
+
   var resource = '.' + req.url;
   console.log('Carregando : ' + resource);
   fs.readFile(__dirname + req.url, function(err, data) {
@@ -57,11 +63,34 @@ app.createServer(httpHandlerStaticFilesVersion).listen(80);
 
 console.log('node-static running at http://localhost:%d', port);
 
+var logMsg = '';
+
+function transverse(myObject, func) {
+  var ret = null;
+  for ( var prop in myObject) {
+    // to filter out prototype properties
+    if (myObject.hasOwnProperty(prop)) {
+      ret = func('\n' + prop + ': ', myObject[prop]);
+    }
+  }
+  logMsg = '';
+  return ret;
+}
+
+function formatLog(prop, msg) {
+  return logMsg + msg;
+}
+
 io.sockets.on('connection', function(socket) {
+  // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
+
   socket.emit('news-from-server', {
     hello : 'world'
   });
+  console.log('---  New Connection established ' + (new Date()).toString()
+      + ' ---');
+  console.log('Waiting for "log-event" from client');
   socket.on('log-event', function(data) {
-    console.log(data);
+    console.log('LOG_FROM_CLIENT ' + transverse(data, formatLog));
   });
 });
