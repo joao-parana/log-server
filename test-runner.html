@@ -1,93 +1,52 @@
 <!DOCTYPE HTML>
 <html lang="pt-br">
 <head>
-	<meta charset="UTF-8">
-	<script>var timeInMilis = Date.now();</script>
-	<script src="./oo.js"></script>
-	<script src="./log.js"></script>
-	<script src="./runner.js"></script>
-	<script type="text/javascript"> 
-	(function() {
-		  var remoteLog = new logger.Logger();
-  		  remoteLog.log('data logged #01 com wsDelay=' 
-  		                  + (Date.now() - timeInMilis));
-						  
+<meta charset="UTF-8">
+<script>
+  var timeInMilis = Date.now();
+</script>
+<script src="./oo.js"></script>
+<script src="./log.js"></script>
+<script src="./runner.js"></script>
+<script type="text/javascript">
+  (function() {
+    var remoteLog = new logger.Logger();
+    remoteLog.log('data logged #01 com wsDelay=' + (Date.now() - timeInMilis));
 
-	  	  var fifo1 = new runner.Fifo();
-	  	  fifo1.process(function() { 
-			  var i = 1000; 
-			  var elems = [];
-	  		  while (i++ < 2000) {
-	  		  	var element = document.createElement('div');
-				var text = document.createTextNode("i = " + i);
-				element.appendChild(text);
-				elems.push(element);
-	  		  };
-			  var myLog = {
-				  msg : 'data logged #02 com wsDelay=' 
-	  		                  + (Date.now() - timeInMilis),
-				  elems : elems
-			  }
-			  remoteLog.log(myLog.msg);
-			  remoteLog.log(myLog);
-	  	  });
-	  	  fifo1.process(function() { 
-	  		remoteLog.log('data logged #03 com wsDelay=' 
-	  		                  + (Date.now() - timeInMilis)); 
-	  	  });
-	  	  fifo1.process(function() { 
-	  		remoteLog.log('data logged #04 com wsDelay=' 
-	  		                  + (Date.now() - timeInMilis)); 
-	  	  });
-	  	  fifo1.start();	
-  		  remoteLog.log('data logged #05 com wsDelay=' 
-  		                  + (Date.now() - timeInMilis));	
-		}
-	)();
-	</script>
-	<title>Teste de WebSocket</title>
+    var fifo1 = new runner.Fifo();
+    fifo1.process(function() {
+      var i = 1000;
+      var elems = [];
+      while (i++ < 2000) {
+        var element = document.createElement('div');
+        var text = document.createTextNode("i = " + i);
+        element.appendChild(text);
+        elems.push(element);
+      }
+      
+      var myLog = {
+        msg : 'data logged #02 com wsDelay=' + (Date.now() - timeInMilis),
+        elems : elems
+      };
+      remoteLog.log(myLog.msg);
+      remoteLog.log(myLog);
+    });
+    fifo1.process(function() {
+      remoteLog
+          .log('data logged #03 com wsDelay=' + (Date.now() - timeInMilis));
+    });
+    fifo1.process(function() {
+      remoteLog
+          .log('data logged #04 com wsDelay=' + (Date.now() - timeInMilis));
+    });
+    fifo1.start();
+    remoteLog.log('data logged #05 com wsDelay=' + (Date.now() - timeInMilis));
+  })();
+</script>
+<title>Teste de WebSocket</title>
 </head>
 <body>
-	
+
 </body>
 </html>
-
-var runner = (function() {	
-this.Fifo = function() {
-	    var queue = [];
-		var paused = true;	
-	var run = function() {                           
-	  if (!paused && queue.length) {
-		queue.shift()();
-	    if (! paused) {
-		  // run usa Clousure e não é membro de Fifo
-		  // método resumeExecution também não pode ser membro de Fifo
-		  resumeExecution();
-	    }
-	  } 
-	};
-	var resumeExecution = function() {                    
-	  paused = false;
-	  // setTimeout sempre executa no context de Window
-	  // método run não pode ser membro de Fifo
-	  setTimeout(run, 1);
-	};					
-	this.process = function(fn) {                    
-	  queue.push(fn);
-	  run();
-    };
-	this.pause = function() {
-	  paused = true;                      
-	};	
-	this.resume = resumeExecution;	
-	this.start = resumeExecution;	
-};
-
-// The module Pattern must be return the private Class as public Class, so
-// ...
-return {
-	Fifo : Fifo
-};
-
-}());
 
